@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mcfunction在线格式化｜我的世界指令文件调试工具</title>
+<meta name="description" content="我的世界 mcfunction 指令文件在线格式化与语法检查工具：粘贴指令代码，一键排版、简单语法错误检测、导出下载 .mcfunction 文件。全部在本地浏览器处理。">
+<meta name="keywords" content="mcfunction格式化,mcfunction语法检查,我的世界数据包指令调试">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310b981'/%3E%3Ctext x='16' y='22' font-size='16' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%23052e1b'%3EMC%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #111827; }
+  ::-webkit-scrollbar-thumb { background: #374151; border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+  .ad-slot { min-height: 90px; border: 1px dashed rgba(148,163,184,.25); border-radius: .75rem; background: rgba(148,163,184,.03); }
+  .code-view { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7; background: #0b1220; border: 1px solid #1f2937; border-radius: .75rem; overflow: auto; }
+  .code-line { display: flex; }
+  .code-line:hover { background: rgba(16,185,129,.05); }
+  .line-num { flex: 0 0 auto; width: 3rem; text-align: right; padding-right: .75rem; color: #4b5563; user-select: none; border-right: 1px solid #1f2937; margin-right: .75rem; }
+  .line-code { padding-right: 1rem; white-space: pre; }
+  .ln-err { background: rgba(239,68,68,.12); }
+</style>
+</head>
+<body class="bg-gray-950 text-gray-200 min-h-screen flex flex-col">
+
+  <header class="sticky top-0 z-50 bg-gray-950/95 backdrop-blur border-b border-gray-800">
+    <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 font-bold text-lg shrink-0">
+        <span class="w-8 h-8 rounded-lg bg-emerald-600 grid place-items-center text-white text-xs font-black tracking-tight">MC</span>
+        <span class="text-gray-100">MC开发者<span class="text-emerald-400">工具箱</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-1">
+        <a href="index.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">首页</a>
+        <a href="nbt.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">NBT转换</a>
+        <a href="datapack-check.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">数据包校验</a>
+        <a href="mcfunc.html" class="px-3 py-2 rounded-lg text-sm bg-emerald-600/20 text-emerald-300 border border-emerald-600/40 font-medium">MCFunction格式化</a>
+        <a href="about.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">关于我们</a>
+      </div>
+      <button id="menuBtn" onclick="toggleNav()" class="md:hidden text-gray-300 hover:text-white p-2" aria-label="菜单">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </nav>
+    <div id="mobileMenu" class="hidden md:hidden border-t border-gray-800 px-4 py-3 space-y-1">
+      <a href="index.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">首页</a>
+      <a href="nbt.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">NBT转换</a>
+      <a href="datapack-check.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">数据包校验</a>
+      <a href="mcfunc.html" class="block px-3 py-2 rounded-lg text-sm bg-emerald-600/20 text-emerald-300 font-medium">MCFunction格式化</a>
+      <a href="about.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">关于我们</a>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full">
+    <section class="max-w-6xl mx-auto px-4 pt-10 pb-8">
+      <h1 class="text-2xl md:text-4xl font-bold text-gray-50">MCFunction 格式化校验</h1>
+      <p class="mt-2 text-gray-400">粘贴 mcfunction 指令代码，一键格式化排版并进行简单语法错误检测，支持导出下载 .mcfunction 文件。</p>
+      <div class="mt-5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-start gap-3 text-amber-200">
+        <span class="text-lg leading-none mt-0.5">⚠️</span>
+        <p>所有代码处理完全本地浏览器完成，你的指令代码不会上传任何服务器。</p>
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-4 pb-10">
+      <div id="errorBox" class="hidden mb-4 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-200 text-sm"></div>
+
+      <div class="rounded-xl border border-gray-800 bg-gray-900/60 p-4">
+        <textarea id="inputCode" rows="12" spellcheck="false" placeholder="在此粘贴 mcfunction 指令代码，每行一条命令，以 # 开头的行是注释……" class="w-full px-4 py-3 rounded-lg text-sm font-mono bg-gray-950 border border-gray-700 text-gray-200 focus:outline-none focus:border-emerald-500 resize-y"></textarea>
+
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 text-sm text-gray-300">
+          <label class="flex items-center gap-2 cursor-pointer"><input id="optSpaces" type="checkbox" checked class="w-4 h-4 accent-emerald-600"> 规范化多余空格</label>
+          <label class="flex items-center gap-2 cursor-pointer"><input id="optTrim" type="checkbox" checked class="w-4 h-4 accent-emerald-600"> 左对齐（去掉行首缩进）</label>
+          <label class="flex items-center gap-2 cursor-pointer"><input id="optCollapse" type="checkbox" checked class="w-4 h-4 accent-emerald-600"> 压缩多余空行</label>
+          <label class="flex items-center gap-2 cursor-pointer"><input id="optTabs" type="checkbox" checked class="w-4 h-4 accent-emerald-600"> Tab 转 4 空格</label>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-4">
+          <button onclick="doFormat()" class="px-4 py-2 rounded-lg text-sm bg-emerald-600 text-white hover:bg-emerald-500">格式化</button>
+          <button onclick="doCheck()" class="px-4 py-2 rounded-lg text-sm bg-gray-800 text-gray-200 border border-gray-700 hover:bg-gray-700">语法检查</button>
+          <button onclick="loadSample()" class="px-4 py-2 rounded-lg text-sm bg-gray-800 text-emerald-300 border border-gray-700 hover:bg-gray-700">载入示例</button>
+          <button onclick="clearAll()" class="px-4 py-2 rounded-lg text-sm bg-gray-800 text-gray-200 border border-gray-700 hover:bg-gray-700">清空</button>
+          <button id="btnDownload" onclick="downloadMcfunc()" disabled class="px-4 py-2 rounded-lg text-sm bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed">下载 .mcfunction</button>
+          <button onclick="copyOutput()" class="px-4 py-2 rounded-lg text-sm bg-gray-800 text-gray-200 border border-gray-700 hover:bg-gray-700">复制结果</button>
+        </div>
+      </div>
+
+      <div id="resultArea" class="hidden mt-6">
+        <div id="statsBar" class="flex flex-wrap items-center gap-3 text-sm text-gray-400 mb-3"></div>
+        <div id="checkSummary" class="hidden mb-3"></div>
+        <div id="issueList" class="space-y-2 mb-4"></div>
+        <div id="outputCode" class="code-view"></div>
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-4 pb-10 text-sm text-gray-400">
+      <details class="rounded-xl border border-gray-800 bg-gray-900/60 p-4">
+        <summary class="cursor-pointer text-gray-300 font-medium hover:text-emerald-300">📖 使用说明</summary>
+        <ul class="mt-3 space-y-2 leading-relaxed list-disc pl-5">
+          <li>mcfunction 文件每行一条命令，<strong class="text-gray-200">命令前不需要写斜杠 “/”</strong>。</li>
+          <li>以 <code class="text-emerald-300">#</code> 开头的行是注释，不会被执行，建议用注释分隔不同功能的命令块。</li>
+          <li>格式化仅调整空白与排版，<strong class="text-gray-200">不改变命令语义</strong>；语法检查能发现引号不配对、括号不平衡等常见问题。</li>
+          <li>本工具无法检测命令的参数是否正确（如实体选择器、坐标、NBT 内容），请以游戏内实际测试为准。</li>
+        </ul>
+      </details>
+    </section>
+
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="ad-slot"></div>
+    </div>
+  </main>
+
+  <footer class="border-t border-gray-800 mt-12 bg-gray-900/40">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <div class="flex flex-col md:flex-row justify-between gap-8">
+        <div class="max-w-md">
+          <p class="font-bold text-gray-100">MC开发者工具箱</p>
+          <p class="text-sm text-gray-400 mt-2 leading-relaxed">我的世界开发者在线工具集合。全部功能均在浏览器本地运行，你的文件不会上传任何服务器，请放心使用。</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-6 text-sm">
+          <div class="space-y-2">
+            <p class="text-gray-500 font-medium">工具</p>
+            <a href="nbt.html" class="block text-gray-400 hover:text-emerald-400">NBT 转换</a>
+            <a href="datapack-check.html" class="block text-gray-400 hover:text-emerald-400">数据包校验</a>
+            <a href="mcfunc.html" class="block text-gray-400 hover:text-emerald-400">MCFunction 格式化</a>
+          </div>
+          <div class="space-y-2">
+            <p class="text-gray-500 font-medium">站点</p>
+            <a href="index.html" class="block text-gray-400 hover:text-emerald-400">首页</a>
+            <a href="about.html" class="block text-gray-400 hover:text-emerald-400">关于我们</a>
+            <a href="privacy.html" class="block text-gray-400 hover:text-emerald-400">隐私政策</a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-5 text-center text-xs text-gray-500 space-y-1">
+        <p>© 2026 MC开发者工具箱 · 保留所有权利</p>
+        <p>本站为独立非官方工具站，与 Mojang Studios / Microsoft 无关。Minecraft 为 Mojang AB 的商标。</p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+var formattedText = '';
+var issueLines = {};
+
+function toggleNav() {
+  document.getElementById('mobileMenu').classList.toggle('hidden');
+}
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function showError(msg) {
+  var box = document.getElementById('errorBox');
+  box.textContent = '❌ ' + msg;
+  box.classList.remove('hidden');
+}
+function clearError() {
+  document.getElementById('errorBox').classList.add('hidden');
+}
+
+function getOpts() {
+  return {
+    spaces: document.getElementById('optSpaces').checked,
+    trim: document.getElementById('optTrim').checked,
+    collapse: document.getElementById('optCollapse').checked,
+    tabs: document.getElementById('optTabs').checked
+  };
+}
+
+function normalizeSpaces(s) {
+  var out = '', inStr = false;
+  for (var i = 0; i < s.length; i++) {
+    var c = s[i];
+    if (c === '"') {
+      var bs = 0, j = i - 1;
+      while (j >= 0 && s[j] === '\\') { bs++; j--; }
+      if (bs % 2 === 0) inStr = !inStr;
+      out += c;
+    } else if (c === ' ' && !inStr) {
+      while (i + 1 < s.length && s[i + 1] === ' ') i++;
+      out += ' ';
+    } else {
+      out += c;
+    }
+  }
+  return out.replace(/\s+$/, '');
+}
+
+function formatText(src, opts) {
+  var lines = src.split(/\r?\n/);
+  var out = [];
+  var blank = 0;
+  for (var i = 0; i < lines.length; i++) {
+    var raw = lines[i];
+    if (raw.trim() === '') {
+      blank++;
+      if (opts.collapse && blank > 1) continue;
+    } else {
+      blank = 0;
+    }
+    var line = raw;
+    if (opts.trim) line = line.replace(/^\s+/, '');
+    if (opts.tabs) line = line.replace(/\t/g, '    ');
+    if (opts.spaces && line.trim().charAt(0) !== '#') line = normalizeSpaces(line);
+    else line = line.replace(/\s+$/, '');
+    out.push(line);
+  }
+  return out.join('\n').replace(/\n+$/, '') + '\n';
+}
+
+/* ---------------- 语法检查 ---------------- */
+function countQuotes(s) {
+  var n = 0, esc2 = false;
+  for (var i = 0; i < s.length; i++) {
+    var c = s[i];
+    if (esc2) { esc2 = false; continue; }
+    if (c === '\\') { esc2 = true; continue; }
+    if (c === '"') n++;
+  }
+  return n;
+}
+function bracketDiff(s) {
+  var d = 0, esc2 = false, inStr = false;
+  for (var i = 0; i < s.length; i++) {
+    var c = s[i];
+    if (esc2) { esc2 = false; continue; }
+    if (c === '\\') { esc2 = true; continue; }
+    if (c === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (c === '(' || c === '[' || c === '{') d++;
+    else if (c === ')' || c === ']' || c === '}') d--;
+  }
+  return d;
+}
+
+function checkText(src) {
+  var issues = [];
+  var lines = src.split(/\r?\n/);
+  for (var i = 0; i < lines.length; i++) {
+    var t = lines[i].trim();
+    if (!t || t.charAt(0) === '#') continue;
+    var n = i + 1;
+    if (t.charAt(0) === '/') {
+      issues.push({ line: n, level: 'error', msg: '命令不应以斜杠 “/” 开头（mcfunction 中命令直接书写）' });
+    }
+    if (t.indexOf('\t') !== -1) {
+      issues.push({ line: n, level: 'warning', msg: '包含 Tab 制表符，建议替换为空格' });
+    }
+    if (countQuotes(t) % 2 === 1) {
+      issues.push({ line: n, level: 'error', msg: '双引号数量不配对（存在未闭合的字符串）' });
+    }
+    var bd = bracketDiff(t);
+    if (bd !== 0) {
+      issues.push({ line: n, level: 'warning', msg: (bd > 0 ? '缺少' + bd + '个' : '多出' + (-bd) + '个') + '闭合括号（()、[]、{} 未配对）' });
+    }
+    var at = t.match(/@(?![pPrRaAeEsScC])[A-Za-z]/);
+    if (at) {
+      issues.push({ line: n, level: 'warning', msg: '未知实体选择器 “@' + at[0].charAt(1) + '”（常用：@p @a @r @e @s @c）' });
+    }
+    if (/^execute\b/.test(t) && !/\brun\b/.test(t)) {
+      issues.push({ line: n, level: 'warning', msg: 'execute 命令没有 run 子命令（可能是空 execute）' });
+    }
+    if (t.indexOf(';') !== -1) {
+      issues.push({ line: n, level: 'warning', msg: '检测到分号 “;”（mcfunction 用换行分隔命令，不使用分号）' });
+    }
+  }
+  return issues;
+}
+
+function renderOutput(text, errLines) {
+  var lines = text.replace(/\n$/, '').split('\n');
+  var html = lines.map(function (l, i) {
+    var n = i + 1;
+    var cls = errLines[n] ? 'ln-err' : '';
+    return '<div class="code-line ' + cls + '"><span class="line-num">' + n + '</span><code class="line-code">' + esc(l) + '</code></div>';
+  }).join('');
+  document.getElementById('outputCode').innerHTML = html;
+}
+
+function showResult() {
+  document.getElementById('resultArea').classList.remove('hidden');
+}
+
+function doFormat() {
+  clearError();
+  var src = document.getElementById('inputCode').value;
+  if (!src.trim()) { showError('请先粘贴要格式化的 mcfunction 代码。'); return; }
+  formattedText = formatText(src, getOpts());
+  issueLines = {};
+  renderOutput(formattedText, issueLines);
+  document.getElementById('issueList').innerHTML = '';
+  document.getElementById('checkSummary').classList.add('hidden');
+  var cmdCount = formattedText.split('\n').filter(function (l) { return l.trim() && l.trim().charAt(0) !== '#'; }).length;
+  document.getElementById('statsBar').innerHTML =
+    '✅ 格式化完成 · 共 <strong class="text-emerald-300">' + formattedText.split('\n').length + '</strong> 行 · 命令 ' + cmdCount + ' 条 · ' + formattedText.length + ' 字符';
+  document.getElementById('btnDownload').disabled = false;
+  document.getElementById('btnDownload').className = 'px-4 py-2 rounded-lg text-sm bg-emerald-600 text-white hover:bg-emerald-500';
+  showResult();
+}
+
+function doCheck() {
+  clearError();
+  var src = document.getElementById('inputCode').value;
+  if (!src.trim()) { showError('请先粘贴要检查的 mcfunction 代码。'); return; }
+  var issues = checkText(src);
+  issueLines = {};
+  issues.forEach(function (it) { issueLines[it.line] = true; });
+  var shown = formattedText ? formattedText : src.replace(/\n+$/, '') + '\n';
+  renderOutput(shown, issueLines);
+
+  var summary = document.getElementById('checkSummary');
+  summary.classList.remove('hidden');
+  if (issues.length === 0) {
+    summary.className = 'mb-3 rounded-xl border border-emerald-600/40 bg-emerald-600/10 px-4 py-3 text-emerald-200 text-sm';
+    summary.textContent = '✅ 未发现明显语法问题。请继续在游戏内实际测试验证命令效果。';
+  } else {
+    summary.className = 'mb-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-200 text-sm';
+    summary.textContent = '共发现 ' + issues.length + ' 个问题（错误 ' + issues.filter(function (x) { return x.level === 'error'; }).length + ' 个，警告 ' + issues.filter(function (x) { return x.level === 'warning'; }).length + ' 个）。';
+  }
+
+  var list = document.getElementById('issueList');
+  list.innerHTML = '';
+  var badge = { error: ['🔴', '错误', 'text-red-200', 'border-red-500/40 bg-red-500/10'], warning: ['🟡', '警告', 'text-amber-200', 'border-amber-500/40 bg-amber-500/10'] };
+  issues.forEach(function (it) {
+    var b = badge[it.level];
+    var div = document.createElement('div');
+    div.className = 'rounded-xl border p-4 flex items-start gap-3 ' + b[3];
+    div.innerHTML =
+      '<span class="text-sm leading-none mt-0.5">' + b[0] + '</span>' +
+      '<div class="min-w-0">' +
+        '<div class="flex items-center gap-2">' +
+          '<span class="px-2 py-0.5 rounded-full text-xs ' + b[2] + '">' + b[1] + '</span>' +
+          '<span class="text-sm text-gray-300">第 ' + it.line + ' 行</span>' +
+        '</div>' +
+        '<p class="mt-1.5 text-sm ' + b[2] + '">' + esc(it.msg) + '</p>' +
+      '</div>';
+    list.appendChild(div);
+  });
+  if (!issues.length) list.innerHTML = '';
+  showResult();
+}
+
+function loadSample() {
+  var sample = [
+    '# 示例：玩家出生点设置',
+    'tp @p 100 64 -200',
+    '',
+    '# 示例：白天 / 好天气',
+    'time set day',
+    'weather clear',
+    '',
+    '# 示例：execute 条件执行',
+    'execute as @a at @s if block ~ ~-1 ~ minecraft:grass_block run say 我站在草方块上',
+    '',
+    'give @p minecraft:diamond 1',
+    'effect give @p minecraft:speed 30 1'
+  ].join('\n');
+  document.getElementById('inputCode').value = sample;
+  clearError();
+}
+
+function clearAll() {
+  document.getElementById('inputCode').value = '';
+  document.getElementById('resultArea').classList.add('hidden');
+  document.getElementById('errorBox').classList.add('hidden');
+  document.getElementById('btnDownload').disabled = true;
+  document.getElementById('btnDownload').className = 'px-4 py-2 rounded-lg text-sm bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed';
+}
+
+function downloadMcfunc() {
+  if (!formattedText) return;
+  var blob = new Blob([formattedText], { type: 'text/plain;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'commands.mcfunction';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+}
+
+function copyOutput() {
+  var text = formattedText || document.getElementById('inputCode').value;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(function () {
+    alert('已复制到剪贴板');
+  }, function () {
+    prompt('复制失败，请手动复制以下内容：', text);
+  });
+}
+</script>
+</body>
+</html>

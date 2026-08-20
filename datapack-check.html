@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC数据包在线校验工具｜一键排查数据包报错</title>
+<meta name="description" content="我的世界数据包在线校验工具：上传数据包 zip，浏览器内自动解压扫描 JSON 语法、命名空间、目录结构错误，输出中文错误清单。只检测，不修改文件。">
+<meta name="keywords" content="我的世界数据包校验,数据包bug检测,数据包报错排查,datapack检查">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310b981'/%3E%3Ctext x='16' y='22' font-size='16' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%23052e1b'%3EMC%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #111827; }
+  ::-webkit-scrollbar-thumb { background: #374151; border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+  .ad-slot { min-height: 90px; border: 1px dashed rgba(148,163,184,.25); border-radius: .75rem; background: rgba(148,163,184,.03); }
+  .code-view { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.6; }
+  .drop-zone.dragover { border-color: #10b981 !important; background: rgba(16,185,129,.08) !important; }
+</style>
+</head>
+<body class="bg-gray-950 text-gray-200 min-h-screen flex flex-col">
+
+  <header class="sticky top-0 z-50 bg-gray-950/95 backdrop-blur border-b border-gray-800">
+    <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 font-bold text-lg shrink-0">
+        <span class="w-8 h-8 rounded-lg bg-emerald-600 grid place-items-center text-white text-xs font-black tracking-tight">MC</span>
+        <span class="text-gray-100">MC开发者<span class="text-emerald-400">工具箱</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-1">
+        <a href="index.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">首页</a>
+        <a href="nbt.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">NBT转换</a>
+        <a href="datapack-check.html" class="px-3 py-2 rounded-lg text-sm bg-emerald-600/20 text-emerald-300 border border-emerald-600/40 font-medium">数据包校验</a>
+        <a href="mcfunc.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">MCFunction格式化</a>
+        <a href="about.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">关于我们</a>
+      </div>
+      <button id="menuBtn" onclick="toggleNav()" class="md:hidden text-gray-300 hover:text-white p-2" aria-label="菜单">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </nav>
+    <div id="mobileMenu" class="hidden md:hidden border-t border-gray-800 px-4 py-3 space-y-1">
+      <a href="index.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">首页</a>
+      <a href="nbt.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">NBT转换</a>
+      <a href="datapack-check.html" class="block px-3 py-2 rounded-lg text-sm bg-emerald-600/20 text-emerald-300 font-medium">数据包校验</a>
+      <a href="mcfunc.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">MCFunction格式化</a>
+      <a href="about.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">关于我们</a>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full">
+    <section class="max-w-6xl mx-auto px-4 pt-10 pb-8">
+      <h1 class="text-2xl md:text-4xl font-bold text-gray-50">数据包批量校验</h1>
+      <p class="mt-2 text-gray-400">上传数据包 zip，浏览器自动解压并扫描：JSON 语法、命名空间、目录结构、mcfunction 常见错误，输出中文报错清单。只检测，不修改你的任何文件。</p>
+      <div class="mt-5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-start gap-3 text-amber-200">
+        <span class="text-lg leading-none mt-0.5">⚠️</span>
+        <p>zip 数据包仅本地解析，不会上传外网。整个解压与检测过程全部在你自己的浏览器中完成。</p>
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-4 pb-10">
+      <div id="errorBox" class="hidden mb-4 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-200 text-sm"></div>
+
+      <div id="dropZone" class="drop-zone cursor-pointer rounded-xl border-2 border-dashed border-gray-700 bg-gray-900/60 hover:border-emerald-600/60 transition-colors p-12 text-center">
+        <input type="file" id="fileInput" accept=".zip" class="hidden">
+        <div class="text-4xl mb-3">🗜️</div>
+        <p class="text-gray-300">点击选择文件，或将数据包 <strong>.zip</strong> 文件拖拽到此处</p>
+        <p class="text-sm text-gray-500 mt-2">支持 Minecraft 1.13+ 数据包结构 · 文件在本机解压检测，不会上传</p>
+      </div>
+
+      <div id="progressArea" class="hidden mt-6">
+        <div class="flex items-center gap-3 text-sm text-gray-400">
+          <span class="inline-block w-4 h-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></span>
+          <span id="progressText">正在解压扫描…</span>
+        </div>
+        <div class="mt-3 h-2 rounded-full bg-gray-800 overflow-hidden">
+          <div id="progressBar" class="h-full bg-emerald-600 transition-all" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div id="resultArea" class="hidden mt-8">
+        <div id="summaryStats" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6"></div>
+        <div id="successBanner" class="hidden rounded-xl border border-emerald-600/40 bg-emerald-600/10 px-4 py-4 text-emerald-200">
+          ✅ 未发现错误与警告，数据包结构基本正确。建议在游戏内加载实际测试验证功能。
+        </div>
+        <div id="issueList" class="space-y-2"></div>
+        <div class="mt-6 flex gap-3">
+          <button onclick="resetAll()" class="px-4 py-2 rounded-lg text-sm bg-gray-800 text-gray-200 border border-gray-700 hover:bg-gray-700">重新上传检测</button>
+          <button onclick="window.print()" class="px-4 py-2 rounded-lg text-sm bg-gray-800 text-gray-200 border border-gray-700 hover:bg-gray-700">打印结果</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-4 pb-10 text-sm text-gray-400">
+      <details class="rounded-xl border border-gray-800 bg-gray-900/60 p-4">
+        <summary class="cursor-pointer text-gray-300 font-medium hover:text-emerald-300">📖 本工具会检测哪些内容？</summary>
+        <ul class="mt-3 space-y-2 leading-relaxed list-disc pl-5">
+          <li><strong class="text-gray-200">pack.mcmeta</strong>：是否缺失、JSON 是否合法、pack_format 版本对应关系。</li>
+          <li><strong class="text-gray-200">命名空间</strong>：data/ 下的命名空间是否符合 <code class="text-emerald-300">[a-z0-9_.-]</code> 规则，文件是否放错位置。</li>
+          <li><strong class="text-gray-200">JSON 语法</strong>：所有 .json 文件的解析错误，并给出出错行列位置。</li>
+          <li><strong class="text-gray-200">目录结构</strong>：mcfunction 是否在 functions/ 下、tags/ 结构是否正确、文件类型与目录是否匹配。</li>
+          <li><strong class="text-gray-200">mcfunction 常见错误</strong>：命令以 “/” 开头、引号不配对、Tab 制表符、未知实体选择器等。</li>
+        </ul>
+        <p class="mt-3 text-gray-500">说明：本工具只做静态检查，无法代替游戏内测试；标注为“警告”的问题不一定导致报错，但建议修正。</p>
+      </details>
+    </section>
+
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="ad-slot"></div>
+    </div>
+  </main>
+
+  <footer class="border-t border-gray-800 mt-12 bg-gray-900/40">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <div class="flex flex-col md:flex-row justify-between gap-8">
+        <div class="max-w-md">
+          <p class="font-bold text-gray-100">MC开发者工具箱</p>
+          <p class="text-sm text-gray-400 mt-2 leading-relaxed">我的世界开发者在线工具集合。全部功能均在浏览器本地运行，你的文件不会上传任何服务器，请放心使用。</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-6 text-sm">
+          <div class="space-y-2">
+            <p class="text-gray-500 font-medium">工具</p>
+            <a href="nbt.html" class="block text-gray-400 hover:text-emerald-400">NBT 转换</a>
+            <a href="datapack-check.html" class="block text-gray-400 hover:text-emerald-400">数据包校验</a>
+            <a href="mcfunc.html" class="block text-gray-400 hover:text-emerald-400">MCFunction 格式化</a>
+          </div>
+          <div class="space-y-2">
+            <p class="text-gray-500 font-medium">站点</p>
+            <a href="index.html" class="block text-gray-400 hover:text-emerald-400">首页</a>
+            <a href="about.html" class="block text-gray-400 hover:text-emerald-400">关于我们</a>
+            <a href="privacy.html" class="block text-gray-400 hover:text-emerald-400">隐私政策</a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-5 text-center text-xs text-gray-500 space-y-1">
+        <p>© 2026 MC开发者工具箱 · 保留所有权利</p>
+        <p>本站为独立非官方工具站，与 Mojang Studios / Microsoft 无关。Minecraft 为 Mojang AB 的商标。</p>
+      </div>
+    </div>
+  </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script>
+var KNOWN_PACK_FORMATS = {
+  3: '1.12.2 及更早', 4: '1.13 – 1.14.4', 5: '1.15 – 1.15.2', 6: '1.16 – 1.16.1',
+  7: '1.16.2 – 1.16.5', 8: '1.17 – 1.17.1', 9: '1.18 – 1.18.1', 10: '1.18.2',
+  11: '1.19 – 1.19.2', 12: '1.19.3', 13: '1.19.4', 15: '1.20 – 1.20.1',
+  18: '1.20.2 – 1.20.3', 26: '1.20.5 – 1.20.6', 41: '1.21 – 1.21.1', 42: '1.21.2 – 1.21.3',
+  48: '1.21.4', 57: '1.21.5 – 1.21.6', 61: '1.21.7（约）'
+};
+var KNOWN_JSON_DIRS = ['loot_tables', 'advancements', 'recipes', 'predicates', 'item_modifiers',
+  'structures', 'damage_type', 'chat_type', 'dimension', 'dimension_type', 'worldgen',
+  'tags', 'jukebox_song', 'banner_pattern', 'enchantment', 'enchantment_provider',
+  'instrument', 'painting_variant', 'trim_material', 'trim_pattern', 'wolf_variant',
+  'jigsaw_patterns', 'music_disc', 'packet_id_mappings', 'function'];
+
+function toggleNav() {
+  document.getElementById('mobileMenu').classList.toggle('hidden');
+}
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function showError(msg) {
+  var box = document.getElementById('errorBox');
+  box.textContent = '❌ ' + msg;
+  box.classList.remove('hidden');
+}
+function setProgress(text, pct) {
+  document.getElementById('progressArea').classList.remove('hidden');
+  document.getElementById('progressText').textContent = text;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+function jsonErrZh(e, text) {
+  var m = /position (\d+)/.exec((e && e.message) || '');
+  if (m) {
+    var pos = +m[1];
+    var up = text.slice(0, pos);
+    var line = up.split('\n').length;
+    var col = pos - (up.lastIndexOf('\n') + 1) + 1;
+    var ch = text[pos] || '文件结尾';
+    return 'JSON 解析失败（第 ' + line + ' 行，第 ' + col + ' 列）：字符 “' + ch + '” 不符合预期，请检查引号、花括号、逗号是否完整';
+  }
+  var msg = (e && e.message) || '未知错误';
+  if (/Unexpected end/.test(msg)) return 'JSON 不完整：数据提前结束，可能缺少右括号或引号';
+  if (/Unexpected token/.test(msg)) return 'JSON 语法错误：存在多余或意外的字符';
+  return 'JSON 解析失败：' + msg;
+}
+
+async function checkZip(file) {
+  var zip;
+  try {
+    zip = await JSZip.loadAsync(file);
+  } catch (e) {
+    showError('无法解压 zip 文件：' + (e && e.message ? e.message : '未知错误') + '。请确认上传的是有效的 zip 数据包。');
+    return;
+  }
+
+  var entries = [];
+  zip.forEach(function (path, entry) {
+    if (!entry.dir) entries.push({ path: path.replace(/\\/g, '/'), entry: entry });
+  });
+
+  var errors = [], warnings = [], infos = [];
+  var E = function (p, m) { errors.push({ path: p, msg: m }); };
+  var W = function (p, m) { warnings.push({ path: p, msg: m }); };
+  var I = function (p, m) { infos.push({ path: p, msg: m }); };
+
+  entries.forEach(function (e) {
+    if (e.path.indexOf('..') !== -1) E(e.path, '路径包含 “..”，存在目录穿越风险');
+    if (/\s/.test(e.path)) W(e.path, '路径包含空格（建议移除）');
+  });
+
+  var mcmeta = null;
+  entries.forEach(function (e) { if (e.path === 'pack.mcmeta') mcmeta = e; });
+  if (!mcmeta) {
+    E('pack.mcmeta', '根目录缺少 pack.mcmeta 文件，这不是一个有效的数据包');
+  } else {
+    var mtxt;
+    try { mtxt = new TextDecoder('utf-8').decode(await mcmeta.entry.async('uint8array')); }
+    catch (e) { mtxt = ''; }
+    try {
+      var mj = JSON.parse(mtxt);
+      var pf = mj.pack && mj.pack.pack_format;
+      if (pf === undefined) E('pack.mcmeta', '缺少 pack_format 字段');
+      else if (KNOWN_PACK_FORMATS[pf]) I('pack.mcmeta', 'pack_format = ' + pf + '（对应 Minecraft ' + KNOWN_PACK_FORMATS[pf] + '，仅供参考）');
+      else W('pack.mcmeta', 'pack_format = ' + pf + '，不在常用版本对照表中，请自行核对版本');
+      if (mj.pack && mj.pack.description === undefined) W('pack.mcmeta', '建议添加 pack.description 描述字段');
+    } catch (e) {
+      E('pack.mcmeta', 'pack.mcmeta 不是合法 JSON：' + jsonErrZh(e, mtxt));
+    }
+  }
+
+  var dataEntries = entries.filter(function (x) { return x.path.indexOf('data/') === 0; });
+  if (!dataEntries.length) {
+    W('data/', '数据包中没有 data/ 目录（可能只是资源包而非数据包）');
+  } else {
+    var namespaces = {};
+    dataEntries.forEach(function (e) {
+      var rest = e.path.slice('data/'.length);
+      var idx = rest.indexOf('/');
+      if (idx === -1) {
+        E(e.path, 'data/ 下不应直接放置文件，应放入 data/<命名空间>/ 目录');
+        return;
+      }
+      var ns = rest.slice(0, idx);
+      (namespaces[ns] = namespaces[ns] || []).push(e);
+      if (!/^[a-z0-9_.-]+$/.test(ns)) {
+        E(e.path, '命名空间 “' + ns + '” 包含非法字符（Minecraft 命名空间仅允许小写字母、数字、_、.、-）');
+      }
+    });
+    Object.keys(namespaces).forEach(function (ns) {
+      var list = namespaces[ns];
+      var base = 'data/' + ns + '/';
+      var fileUnder = list.filter(function (x) { return x.path.indexOf(base) === 0 && x.path.slice(base.length).indexOf('/') === -1; });
+      fileUnder.forEach(function (e) {
+        E(e.path, '文件直接放在命名空间根目录，应放入对应子目录（如 functions/、loot_tables/、tags/）');
+      });
+    });
+  }
+
+  var jsonCount = 0, mcfuncCount = 0, otherCount = 0;
+  var total = entries.length, done = 0;
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    var name = e.path.split('/').pop();
+    var dot = name.lastIndexOf('.');
+    var ext = dot === -1 ? '' : name.slice(dot).toLowerCase();
+    var seg = e.path.split('/');
+    var isFunctions = seg.indexOf('functions') !== -1;
+
+    if (ext === '.json') {
+      jsonCount++;
+      var jbytes;
+      try { jbytes = await e.entry.async('uint8array'); }
+      catch (ex) { E(e.path, '读取文件失败：' + (ex.message || '未知错误')); done++; continue; }
+      if (jbytes.length > 25 * 1024 * 1024) { W(e.path, '文件超过 25MB，跳过内容校验'); done++; continue; }
+      var jtxt = new TextDecoder('utf-8').decode(jbytes);
+      try { JSON.parse(jtxt); }
+      catch (ex) { E(e.path, jsonErrZh(ex, jtxt)); }
+      if (isFunctions) W(e.path, 'functions 目录中不应出现 .json 文件（应为 .mcfunction）');
+      var ti = seg.indexOf('tags');
+      if (ti !== -1 && seg.length !== ti + 3) W(e.path, 'tags 文件建议位于 tags/<类型>/<文件名>.json 结构');
+      if (jtxt.length === 0) E(e.path, 'JSON 文件为空');
+
+    } else if (ext === '.mcfunction') {
+      mcfuncCount++;
+      if (!isFunctions) E(e.path, 'mcfunction 文件应位于 data/<命名空间>/functions/ 目录');
+      var mbytes;
+      try { mbytes = await e.entry.async('uint8array'); }
+      catch (ex) { E(e.path, '读取文件失败：' + (ex.message || '未知错误')); done++; continue; }
+      if (mbytes.length > 10 * 1024 * 1024) { W(e.path, '文件超过 10MB，跳过内容检查'); done++; continue; }
+      var mctxt = new TextDecoder('utf-8').decode(mbytes);
+      var lines = mctxt.split(/\r?\n/);
+      for (var li = 0; li < lines.length; li++) {
+        var t = lines[li].trim();
+        if (!t || t.charAt(0) === '#') continue;
+        var loc = e.path + ':' + (li + 1);
+        if (t.charAt(0) === '/') E(loc, '命令不应以 “/” 开头（mcfunction 中命令直接书写，不加斜杠）');
+        if (t.indexOf('\t') !== -1) W(loc, '包含 Tab 制表符（建议替换为空格）');
+        var q = 0, j, esc2 = false;
+        for (j = 0; j < t.length; j++) {
+          var c = t[j];
+          if (esc2) { esc2 = false; continue; }
+          if (c === '\\') { esc2 = true; continue; }
+          if (c === '"') q++;
+        }
+        if (q % 2 === 1) E(loc, '双引号数量不配对（有未闭合的字符串）');
+        var at = t.match(/@(?![pPrRaAeEsScC])[A-Za-z]/);
+        if (at) W(loc, '检测到未知实体选择器 “@' + at[0].charAt(1) + '”（常用：@p @a @r @e @s @c）');
+      }
+
+    } else {
+      otherCount++;
+      if (isFunctions) E(e.path, 'functions/ 目录中出现了 ' + ext + ' 文件（应为 .mcfunction）');
+      for (var d = 0; d < KNOWN_JSON_DIRS.length; d++) {
+        if (seg.indexOf(KNOWN_JSON_DIRS[d]) !== -1 && ext !== '.json' && ext !== '') {
+          W(e.path, '“' + KNOWN_JSON_DIRS[d] + '” 目录中出现了 ' + ext + ' 文件（通常应为 .json）');
+          break;
+        }
+      }
+    }
+
+    done++;
+    if (done % 40 === 0 || done === total) {
+      setProgress('扫描中… ' + done + ' / ' + total + ' 个文件', Math.round(done / total * 100));
+      await sleep(0);
+    }
+  }
+
+  renderResults(file, { errors: errors, warnings: warnings, infos: infos, jsonCount: jsonCount, mcfuncCount: mcfuncCount, otherCount: otherCount });
+}
+
+function renderResults(file, res) {
+  document.getElementById('progressArea').classList.add('hidden');
+
+  var stats = [
+    { label: '总文件数', val: res.jsonCount + res.mcfuncCount + res.otherCount, color: 'text-gray-200' },
+    { label: 'JSON 文件', val: res.jsonCount, color: 'text-sky-300' },
+    { label: 'mcfunction', val: res.mcfuncCount, color: 'text-emerald-300' },
+    { label: '错误', val: res.errors.length, color: res.errors.length ? 'text-red-400' : 'text-emerald-300' },
+    { label: '警告', val: res.warnings.length, color: res.warnings.length ? 'text-amber-300' : 'text-emerald-300' }
+  ];
+  document.getElementById('summaryStats').innerHTML = stats.map(function (s) {
+    return '<div class="rounded-xl border border-gray-800 bg-gray-900/60 p-4 text-center">' +
+      '<p class="text-2xl font-bold ' + s.color + '">' + s.val + '</p>' +
+      '<p class="text-xs text-gray-500 mt-1">' + s.label + '</p></div>';
+  }).join('');
+
+  var list = document.getElementById('issueList');
+  list.innerHTML = '';
+  var items = [];
+  res.errors.forEach(function (x) { items.push({ level: 'error', path: x.path, msg: x.msg }); });
+  res.warnings.forEach(function (x) { items.push({ level: 'warning', path: x.path, msg: x.msg }); });
+  res.infos.forEach(function (x) { items.push({ level: 'info', path: x.path, msg: x.msg }); });
+
+  document.getElementById('successBanner').classList.toggle('hidden', items.length > 0);
+
+  var iconMap = { error: '🔴', warning: '🟡', info: '🔵' };
+  var badgeMap = { error: '错误', warning: '警告', info: '提示' };
+  var colorMap = {
+    error: 'border-red-500/40 bg-red-500/10',
+    warning: 'border-amber-500/40 bg-amber-500/10',
+    info: 'border-sky-500/40 bg-sky-500/10'
+  };
+  var textColor = { error: 'text-red-200', warning: 'text-amber-200', info: 'text-sky-200' };
+
+  if (!items.length) {
+    list.innerHTML = '<p class="text-sm text-gray-400">（无输出）</p>';
+  }
+  items.forEach(function (it) {
+    var div = document.createElement('div');
+    div.className = 'rounded-xl border p-4 flex items-start gap-3 ' + colorMap[it.level];
+    div.innerHTML =
+      '<span class="text-sm leading-none mt-0.5">' + iconMap[it.level] + '</span>' +
+      '<div class="min-w-0">' +
+        '<div class="flex flex-wrap items-center gap-2">' +
+          '<span class="px-2 py-0.5 rounded-full text-xs border border-current/20 ' + textColor[it.level] + '">' + badgeMap[it.level] + '</span>' +
+          '<code class="code-view break-all text-gray-300">' + esc(it.path) + '</code>' +
+        '</div>' +
+        '<p class="mt-1.5 text-sm ' + textColor[it.level] + '">' + esc(it.msg) + '</p>' +
+      '</div>';
+    list.appendChild(div);
+  });
+
+  document.getElementById('resultArea').classList.remove('hidden');
+  document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetAll() {
+  document.getElementById('errorBox').classList.add('hidden');
+  document.getElementById('resultArea').classList.add('hidden');
+  document.getElementById('progressArea').classList.add('hidden');
+  document.getElementById('fileInput').value = '';
+}
+
+var dropZone = document.getElementById('dropZone');
+var fileInput = document.getElementById('fileInput');
+dropZone.addEventListener('click', function () { fileInput.click(); });
+fileInput.addEventListener('change', function () {
+  if (fileInput.files && fileInput.files[0]) checkZip(fileInput.files[0]);
+});
+['dragenter', 'dragover'].forEach(function (ev) {
+  dropZone.addEventListener(ev, function (e) { e.preventDefault(); dropZone.classList.add('dragover'); });
+});
+['dragleave', 'drop'].forEach(function (ev) {
+  dropZone.addEventListener(ev, function (e) { e.preventDefault(); dropZone.classList.remove('dragover'); });
+});
+dropZone.addEventListener('drop', function (e) {
+  var f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) checkZip(f);
+});
+</script>
+</body>
+</html>

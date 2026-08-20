@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC开发者工具箱｜我的世界NBT、数据包、指令在线工具</title>
+<meta name="description" content="我的世界开发者工具箱：NBT转JSON、存档dat解析、数据包zip校验、mcfunction格式化，全部工具均在浏览器本地运行，文件绝不上传服务器。">
+<meta name="keywords" content="我的世界,nbt转json,mcfunction格式化,数据包校验,战利品表解析,dat文件在线查看,数据包bug排查">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310b981'/%3E%3Ctext x='16' y='22' font-size='16' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%23052e1b'%3EMC%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #111827; }
+  ::-webkit-scrollbar-thumb { background: #374151; border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+  .ad-slot { min-height: 90px; border: 1px dashed rgba(148,163,184,.25); border-radius: .75rem; background: rgba(148,163,184,.03); }
+</style>
+</head>
+<body class="bg-gray-950 text-gray-200 min-h-screen flex flex-col">
+
+  <header class="sticky top-0 z-50 bg-gray-950/95 backdrop-blur border-b border-gray-800">
+    <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 font-bold text-lg shrink-0">
+        <span class="w-8 h-8 rounded-lg bg-emerald-600 grid place-items-center text-white text-xs font-black tracking-tight">MC</span>
+        <span class="text-gray-100">MC开发者<span class="text-emerald-400">工具箱</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-1" id="navMenu">
+        <a href="index.html" class="px-3 py-2 rounded-lg text-sm bg-emerald-600/20 text-emerald-300 border border-emerald-600/40 font-medium">首页</a>
+        <a href="nbt.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">NBT转换</a>
+        <a href="datapack-check.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">数据包校验</a>
+        <a href="mcfunc.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">MCFunction格式化</a>
+        <a href="about.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">关于我们</a>
+      </div>
+      <button id="menuBtn" onclick="toggleNav()" class="md:hidden text-gray-300 hover:text-white p-2" aria-label="菜单">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </nav>
+    <div id="mobileMenu" class="hidden md:hidden border-t border-gray-800 px-4 py-3 space-y-1">
+      <a href="index.html" class="block px-3 py-2 rounded-lg text-sm bg-emerald-600/20 text-emerald-300 font-medium">首页</a>
+      <a href="nbt.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">NBT转换</a>
+      <a href="datapack-check.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">数据包校验</a>
+      <a href="mcfunc.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">MCFunction格式化</a>
+      <a href="about.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">关于我们</a>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full">
+    <section class="max-w-6xl mx-auto px-4 pt-14 pb-10 text-center">
+      <h1 class="text-3xl md:text-5xl font-bold text-gray-50 leading-tight">MC开发者<span class="text-emerald-400">工具箱</span></h1>
+      <p class="mt-4 text-gray-400 text-base md:text-lg max-w-2xl mx-auto">为我的世界 Java 版数据包、存档与指令开发者打造的免费在线工具集合。</p>
+      <div class="mt-8 max-w-3xl mx-auto rounded-xl border border-emerald-600/40 bg-emerald-600/10 px-6 py-4 text-left">
+        <p class="flex items-start gap-3 text-emerald-200">
+          <span class="text-lg leading-none mt-0.5">🛡️</span>
+          <span><strong>隐私保障：</strong>本网站全部工具均在浏览器本地运行，文件不会上传服务器。你上传的存档、数据包、指令代码只会在你自己的电脑内存中处理，关闭页面即自动销毁。</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-4 pb-12">
+      <h2 class="text-xl md:text-2xl font-bold text-gray-100 mb-6">选择你的工具</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+        <a href="nbt.html" class="group bg-gray-900 border border-gray-800 rounded-xl p-6 flex flex-col hover:border-emerald-600/60 hover:shadow-lg hover:shadow-emerald-900/20 transition-all">
+          <div class="w-11 h-11 rounded-lg bg-emerald-600/15 text-emerald-400 grid place-items-center text-2xl mb-4">🧱</div>
+          <h3 class="font-bold text-gray-100 group-hover:text-emerald-300 transition-colors">NBT 转换工具</h3>
+          <p class="mt-2 text-sm text-gray-400 flex-1">上传 .nbt / .dat 存档文件，在 NBT 与 JSON 之间互相转换，支持 gzip 压缩 Java 版 NBT，JSON 语法高亮显示。</p>
+          <span class="mt-4 inline-flex items-center gap-1 text-sm text-emerald-400">进入工具 <span class="group-hover:translate-x-1 transition-transform">→</span></span>
+        </a>
+
+        <a href="datapack-check.html" class="group bg-gray-900 border border-gray-800 rounded-xl p-6 flex flex-col hover:border-emerald-600/60 hover:shadow-lg hover:shadow-emerald-900/20 transition-all">
+          <div class="w-11 h-11 rounded-lg bg-emerald-600/15 text-emerald-400 grid place-items-center text-2xl mb-4">📦</div>
+          <h3 class="font-bold text-gray-100 group-hover:text-emerald-300 transition-colors">数据包批量校验</h3>
+          <p class="mt-2 text-sm text-gray-400 flex-1">上传数据包 zip，浏览器内自动解压扫描：JSON 语法、命名空间、目录结构错误一键排查，输出中文报错清单。</p>
+          <span class="mt-4 inline-flex items-center gap-1 text-sm text-emerald-400">进入工具 <span class="group-hover:translate-x-1 transition-transform">→</span></span>
+        </a>
+
+        <a href="mcfunc.html" class="group bg-gray-900 border border-gray-800 rounded-xl p-6 flex flex-col hover:border-emerald-600/60 hover:shadow-lg hover:shadow-emerald-900/20 transition-all">
+          <div class="w-11 h-11 rounded-lg bg-emerald-600/15 text-emerald-400 grid place-items-center text-2xl mb-4">⚙️</div>
+          <h3 class="font-bold text-gray-100 group-hover:text-emerald-300 transition-colors">MCFunction 格式化</h3>
+          <p class="mt-2 text-sm text-gray-400 flex-1">粘贴 mcfunction 指令代码，一键格式化排版并进行简单语法错误检测，一键导出 .mcfunction 文件。</p>
+          <span class="mt-4 inline-flex items-center gap-1 text-sm text-emerald-400">进入工具 <span class="group-hover:translate-x-1 transition-transform">→</span></span>
+        </a>
+
+        <div class="bg-gray-900/60 border border-dashed border-gray-700 rounded-xl p-6 flex flex-col opacity-80">
+          <div class="w-11 h-11 rounded-lg bg-gray-800 text-gray-500 grid place-items-center text-2xl mb-4">🌐</div>
+          <h3 class="font-bold text-gray-400">Mod 模组汉化翻译</h3>
+          <span class="inline-flex items-center gap-1.5 text-xs text-gray-500">
+            <span class="px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">开发中</span>
+          </span>
+          <p class="mt-2 text-sm text-gray-500 flex-1">模组语言文件汉化翻译、多版本语言文件对照合并功能正在开发中，敬请期待。</p>
+          <span class="mt-4 inline-flex items-center gap-1 text-sm text-gray-600">敬请期待</span>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-4 pb-12">
+      <h2 class="text-xl md:text-2xl font-bold text-gray-100 mb-6">为什么选择我们</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <h3 class="font-bold text-emerald-400 mb-2">🔒 纯本地运算</h3>
+          <p class="text-sm text-gray-400">所有解析、格式化、校验全部在你的浏览器中完成，无需注册账号，无后端服务器。</p>
+        </div>
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <h3 class="font-bold text-emerald-400 mb-2">🛡️ 文件绝不外传</h3>
+          <p class="text-sm text-gray-400">你的存档、数据包、指令代码只存在于浏览器内存中，页面关闭即销毁，任何时刻都不会被上传。</p>
+        </div>
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <h3 class="font-bold text-emerald-400 mb-2">🆓 完全免费</h3>
+          <p class="text-sm text-gray-400">所有工具永久免费使用，无需安装任何软件，打开浏览器即可开始开发。</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="ad-slot"></div>
+    </div>
+  </main>
+
+  <footer class="border-t border-gray-800 mt-12 bg-gray-900/40">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <div class="flex flex-col md:flex-row justify-between gap-8">
+        <div class="max-w-md">
+          <p class="font-bold text-gray-100">MC开发者工具箱</p>
+          <p class="text-sm text-gray-400 mt-2 leading-relaxed">我的世界开发者在线工具集合。全部功能均在浏览器本地运行，你的文件不会上传任何服务器，请放心使用。</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-6 text-sm">
+          <div class="space-y-2">
+            <p class="text-gray-500 font-medium">工具</p>
+            <a href="nbt.html" class="block text-gray-400 hover:text-emerald-400">NBT 转换</a>
+            <a href="datapack-check.html" class="block text-gray-400 hover:text-emerald-400">数据包校验</a>
+            <a href="mcfunc.html" class="block text-gray-400 hover:text-emerald-400">MCFunction 格式化</a>
+          </div>
+          <div class="space-y-2">
+            <p class="text-gray-500 font-medium">站点</p>
+            <a href="index.html" class="block text-gray-400 hover:text-emerald-400">首页</a>
+            <a href="about.html" class="block text-gray-400 hover:text-emerald-400">关于我们</a>
+            <a href="privacy.html" class="block text-gray-400 hover:text-emerald-400">隐私政策</a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-5 text-center text-xs text-gray-500 space-y-1">
+        <p>© 2026 MC开发者工具箱 · 保留所有权利</p>
+        <p>本站为独立非官方工具站，与 Mojang Studios / Microsoft 无关。Minecraft 为 Mojang AB 的商标。</p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+function toggleNav() {
+  var m = document.getElementById('mobileMenu');
+  m.classList.toggle('hidden');
+}
+</script>
+</body>
+</html>

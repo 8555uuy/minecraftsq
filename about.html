@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关于我们｜MC开发者工具箱</title>
+<meta name="description" content="关于 MC开发者工具箱：我的世界开发者在线工具集合，全部功能浏览器本地运行，文件绝不上传服务器。了解我们的开发目的与技术实现。">
+<meta name="keywords" content="关于我们,mc开发者工具箱,我的世界开发工具,本地运算">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310b981'/%3E%3Ctext x='16' y='22' font-size='16' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%23052e1b'%3EMC%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #111827; }
+  ::-webkit-scrollbar-thumb { background: #374151; border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+  .ad-slot { min-height: 90px; border: 1px dashed rgba(148,163,184,.25); border-radius: .75rem; background: rgba(148,163,184,.03); }
+</style>
+</head>
+<body class="bg-gray-950 text-gray-200 min-h-screen flex flex-col">
+
+  <header class="sticky top-0 z-50 bg-gray-950/95 backdrop-blur border-b border-gray-800">
+    <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 font-bold text-lg shrink-0">
+        <span class="w-8 h-8 rounded-lg bg-emerald-600 grid place-items-center text-white text-xs font-black tracking-tight">MC</span>
+        <span class="text-gray-100">MC开发者<span class="text-emerald-400">工具箱</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-1">
+        <a href="index.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">首页</a>
+        <a href="nbt.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">NBT转换</a>
+        <a href="datapack-check.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">数据包校验</a>
+        <a href="mcfunc.html" class="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">MCFunction格式化</a>
+        <a href="about.html" class="px-3 py-2 rounded-lg text-sm bg-emerald-600/20 text-emerald-300 border border-emerald-600/40 font-medium">关于我们</a>
+      </div>
+      <button id="menuBtn" onclick="toggleNav()" class="md:hidden text-gray-300 hover:text-white p-2" aria-label="菜单">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </nav>
+    <div id="mobileMenu" class="hidden md:hidden border-t border-gray-800 px-4 py-3 space-y-1">
+      <a href="index.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">首页</a>
+      <a href="nbt.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">NBT转换</a>
+      <a href="datapack-check.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">数据包校验</a>
+      <a href="mcfunc.html" class="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">MCFunction格式化</a>
+      <a href="about.html" class="block px-3 py-2 rounded-lg text-sm bg-emerald-600/20 text-emerald-300 font-medium">关于我们</a>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full">
+    <section class="max-w-6xl mx-auto px-4 pt-10 pb-8">
+      <h1 class="text-2xl md:text-4xl font-bold text-gray-50">关于我们</h1>
+      <p class="mt-2 text-gray-400">认识 MC开发者工具箱 —— 一个为我的世界开发者打造的全本地在线工具集合。</p>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-4 pb-10 space-y-6 text-gray-300 leading-relaxed">
+
+      <div class="rounded-xl border border-gray-800 bg-gray-900/60 p-6">
+        <h2 class="text-lg font-bold text-emerald-400 mb-3">🧰 我们是谁</h2>
+        <p>MC开发者工具箱是一个面向我的世界（Minecraft）Java 版开发者的在线工具集合网站。我们致力于把数据包开发、存档分析、指令调试中常见的重复性工作整理成简单易用的网页工具，让开发者可以快速完成 <strong>NBT 与 JSON 互相转换、数据包 zip 批量校验、mcfunction 格式化与语法检查</strong>等工作，从而把精力更多地放在创作本身。</p>
+      </div>
+
+      <div class="rounded-xl border border-gray-800 bg-gray-900/60 p-6">
+        <h2 class="text-lg font-bold text-emerald-400 mb-3">🎯 项目用途与开发目的</h2>
+        <p>在数据包与存档开发过程中，开发者常常需要在 NBT、JSON、指令三种格式之间反复切换，还要面对"哪里写错了导致数据包加载失败"这类难以排查的问题。市面上的同类工具往往依赖服务器上传处理，开发者会担心自己的存档数据安全。</p>
+        <p class="mt-3">因此我们开发这个项目，目的是：</p>
+        <ul class="mt-3 space-y-2 list-disc pl-6">
+          <li>为中文 MC 开发者提供一套<strong>免费、无门槛、无需注册</strong>的常用工具。</li>
+          <li>坚持<strong>全部功能在浏览器本地运行</strong>，用户的存档、数据包文件只在本机内存中处理，从技术上杜绝文件外泄的可能。</li>
+          <li>持续补充数据包开发中高频使用的辅助功能，帮助新手快速上手，帮助老手提升效率。</li>
+        </ul>
+      </div>
+
+      <div class="rounded-xl border border-gray-800 bg-gray-900/60 p-6">
+        <h2 class="text-lg font-bold text-emerald-400 mb-3">⚙️ 技术实现</h2>
+        <p>本网站是纯前端静态网站，采用 <strong>HTML + TailwindCSS + 原生 JavaScript</strong> 构建，并在浏览器端引入 <strong>JSZip</strong>（zip 解压）与 <strong>nbt.js</strong>（NBT 解析）等开源库。整站没有后端服务器，所有文件读取、解析、格式化、校验均由你的浏览器本地完成，双击 HTML 文件即可离线使用全部功能。</p>
+      </div>
+
+      <div class="rounded-xl border border-gray-800 bg-gray-900/60 p-6">
+        <h2 class="text-lg font-bold text-emerald-400 mb-3">📦 当前功能</h2>
+        <ul class="space-y-2 list-disc pl-6">
+          <li><strong>NBT 转换工具</strong>：上传 .nbt / .dat 存档文件，NBT ↔ JSON 互相转换，支持 gzip 压缩 Java 版 NBT，JSON 语法高亮，中文错误提示。</li>
+          <li><strong>数据包批量校验</strong>：上传数据包 zip，浏览器自动解压扫描 JSON 语法、命名空间、目录结构与 mcfunction 常见错误，输出中文错误清单。</li>
+          <li><strong>MCFunction 格式化</strong>：粘贴指令代码，一键格式化排版、简单语法错误检测，导出下载 .mcfunction 文件。</li>
+          <li><strong>Mod 模组汉化翻译</strong>：正在开发中，敬请期待。</li>
+        </ul>
+      </div>
+
+      <div class="rounded-xl border border-gray-800 bg-gray-900/60 p-6">
+        <h2 class="text-lg font-bold text-emerald-400 mb-3">🔒 隐私承诺</h2>
+        <p>我们始终把用户数据安全放在第一位：本网站不注册账号、没有后端、不收集任何用户文件，你上传或粘贴的所有内容只会停留在你自己的浏览器中，关闭页面即自动销毁。详细说明请查看<a href="privacy.html" class="text-emerald-400 underline hover:text-emerald-300">隐私政策</a>。</p>
+      </div>
+
+      <div class="rounded-xl border border-gray-800 bg-gray-900/60 p-6">
+        <h2 class="text-lg font-bold text-emerald-400 mb-3">📝 免责声明</h2>
+        <p>本站是独立制作的非官方工具站，与 Mojang Studios、Microsoft 及其关联公司无任何隶属或合作关系。Minecraft 是 Mojang AB 的注册商标。本站工具仅作辅助开发用途，请以游戏内的实际表现为准。</p>
+        <p class="mt-3">如对本站有任何建议、问题或希望我们开发的新工具，欢迎通过邮件联系我们：<a href="mailto:contact@mctoolbox.example" class="text-emerald-400 underline hover:text-emerald-300">contact@mctoolbox.example</a>。</p>
+      </div>
+
+    </section>
+
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="ad-slot"></div>
+    </div>
+  </main>
+
+  <footer class="border-t border-gray-800 mt-12 bg-gray-900/40">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <div class="flex flex-col md:flex-row justify-between gap-8">
+        <div class="max-w-md">
+          <p class="font-bold text-gray-100">MC开发者工具箱</p>
+          <p class="text-sm text-gray-400 mt-2 leading-relaxed">我的世界开发者在线工具集合。全部功能均在浏览器本地运行，你的文件不会上传任何服务器，请放心使用。</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-6 text-sm">
+          <div class="space-y-2">
+            <p class="text-gray-500 font-medium">工具</p>
+            <a href="nbt.html" class="block text-gray-400 hover:text-emerald-400">NBT 转换</a>
+            <a href="datapack-check.html" class="block text-gray-400 hover:text-emerald-400">数据包校验</a>
+            <a href="mcfunc.html" class="block text-gray-400 hover:text-emerald-400">MCFunction 格式化</a>
+          </div>
+          <div class="space-y-2">
+            <p class="text-gray-500 font-medium">站点</p>
+            <a href="index.html" class="block text-gray-400 hover:text-emerald-400">首页</a>
+            <a href="about.html" class="block text-gray-400 hover:text-emerald-400">关于我们</a>
+            <a href="privacy.html" class="block text-gray-400 hover:text-emerald-400">隐私政策</a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-5 text-center text-xs text-gray-500 space-y-1">
+        <p>© 2026 MC开发者工具箱 · 保留所有权利</p>
+        <p>本站为独立非官方工具站，与 Mojang Studios / Microsoft 无关。Minecraft 为 Mojang AB 的商标。</p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+function toggleNav() {
+  document.getElementById('mobileMenu').classList.toggle('hidden');
+}
+</script>
+</body>
+</html>
